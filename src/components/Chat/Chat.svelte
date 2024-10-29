@@ -5,7 +5,7 @@
     let currentMessage: string = "";
     const API_KEY = env.PUBLIC_VITE_DIFY_API_KEY; // Store this securely!
 
-    $:conversationId="";
+    let conversationId="";
     $:console.log(conversationId);
 
     type Message = {
