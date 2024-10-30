@@ -2,7 +2,7 @@
     
     function toggleTheme(event: Event) {
       const isChecked = (event.target as HTMLInputElement).checked;
-      document.body.setAttribute('data-theme', isChecked ? 'dark' : 'light');
+      document.body.setAttribute('data-theme', isChecked ? 'synthwave' : 'bumblebee');
     }
   </script>
   

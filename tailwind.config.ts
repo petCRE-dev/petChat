@@ -20,11 +20,12 @@ export default {
 	],
 	daisyui: {
 		themes: [
-			'light',      // Default light theme
+			'bumblebee',      // Default light theme
 			'dark',       // Default dark theme
-			'cupcake',    // Additional DaisyUI themes (customize as needed)
+			    // Additional DaisyUI themes (customize as needed)
 			'forest', 
-			'corporate'
+			'corporate',
+			'synthwave'
 		], 
 		styled: true,
 		base: true,
@@ -32,6 +33,6 @@ export default {
 		logs: true,
 		rtl: false,
 		prefix: "",
-		darkTheme: "dark"  // Set the default dark theme
+		darkTheme: "synthwave"  // Set the default dark theme
 	}
 } satisfies Config;
