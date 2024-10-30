@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { DifyResponse } from "../../types/types";
+import Pill from "../Pill.svelte";
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
   async function submitQuery() {
@@ -8,6 +9,7 @@
       let userMessage: DifyResponse = {
         answer: query,
         role: "user",
+        metadata:{}
       };
       messages = [...messages, userMessage];
       query = "";
@@ -53,16 +55,28 @@
     class="flex-grow overflow-y-auto p-4 bg-base-200 space-y-4"
   >
     {#each messages as message}
-    {#if message.role=="assistant"}
-    <div class="chat chat-start">
-      <div class="chat-bubble bg-primary text-white">{message.answer}</div>
-    </div>
+      {#if message.role == "assistant"}
+        <div class="chat chat-start">
+          <div class="chat-bubble bg-primary text-white">
+            {message.answer}
+            <br>
+            <span>
+              {#if (message.metadata.retriever_resources??[]).length > 0}
+                {#each (message.metadata.retriever_resources) ?? [] as retriever}
+                  <Pill
+                    id={retriever.segment_id}
+                    content={JSON.stringify(retriever)}
+                  />
+                {/each}
+              {/if}
+            </span>
+          </div>
+        </div>
       {:else}
-      <div class="chat chat-end">
-        <div class="chat-bubble ">{message.answer}</div>
-      </div>
-    {/if}
-     
+        <div class="chat chat-end">
+          <div class="chat-bubble">{message.answer}</div>
+        </div>
+      {/if}
     {/each}
     <!-- Example messages (replace with dynamic content) -->
 

@@ -7,7 +7,7 @@ export type DifyResponse = {
 	conversation_id?: string;
 	mode?: string;
 	answer?: string;
-	metadata?: {
+	metadata: {
 		usage?: {
 			prompt_tokens: number;
 			prompt_unit_price: string;
