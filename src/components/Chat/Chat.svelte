@@ -59,7 +59,7 @@
     </div>
       {:else}
       <div class="chat chat-end">
-        <div class="chat-bubble bg-primary text-white">{message.answer}</div>
+        <div class="chat-bubble ">{message.answer}</div>
       </div>
     {/if}
      
