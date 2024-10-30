@@ -115,6 +115,6 @@
   <!-- Input Area - Fixed at the bottom -->
   <div id="chat-input" class="flex items-center gap-2 p-4 bg-base-100 border-t border-gray-200 sticky bottom-0">
     <input class="input input-bordered flex-grow" type="text" bind:value={query} placeholder="Enter your query" />
-    <button on:click={submitQuery} class="btn btn-primary btn-sm"> Submit Query </button>
+    <button on:click={submitQuery} class="btn btn-accent btn-sm"> Submit Query </button>
   </div>
 </div>
