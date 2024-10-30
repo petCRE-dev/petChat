@@ -1,13 +1,14 @@
 export type DifyResponse = {
-	event: string;
-	task_id: string;
-	id: string;
-	message_id: string;
-	conversation_id: string;
-	mode: string;
-	answer: string;
-	metadata: {
-		usage: {
+    role?:string,
+	event?: string;
+	task_id?: string;
+	id?: string;
+	message_id?: string;
+	conversation_id?: string;
+	mode?: string;
+	answer?: string;
+	metadata?: {
+		usage?: {
 			prompt_tokens: number;
 			prompt_unit_price: string;
 			prompt_price_unit: string;
@@ -21,7 +22,7 @@ export type DifyResponse = {
 			currency: string;
 			latency: number;
 		};
-        retriever_resources: Array<{
+        retriever_resources?: Array<{
 			dataset_id: string;
 			dataset_name: string;
 			document_id: string;
@@ -34,5 +35,5 @@ export type DifyResponse = {
 			position: number;
 		}>;
 	};
-	created_at: number;
+	created_at?: number;
 };

@@ -5,9 +5,15 @@
   let messages: DifyResponse[] = []; // Initialize messages array
   async function submitQuery() {
     try {
+      let userMessage: DifyResponse = {
+        answer: query,
+        role: "user",
+      };
+      messages = [...messages, userMessage];
+      query = "";
       // Define the payload to send to the endpoint
       const payload = {
-        query: query,
+        query: userMessage.answer,
         response_mode: "blocking",
         conversation_id: "",
         user: "abc-123",
@@ -30,9 +36,10 @@
       }
 
       const result: DifyResponse = await response.json();
-      messages = [...messages, result]
-      query=""
-      console.log("Response:", messages); // Log or display the result as needed
+      result.role = "assistant";
+      messages = [...messages, result];
+
+      // Log or display the result as needed
     } catch (error) {
       console.error(error); // Handle errors gracefully
     }
@@ -46,9 +53,16 @@
     class="flex-grow overflow-y-auto p-4 bg-base-200 space-y-4"
   >
     {#each messages as message}
-      <div class="chat chat-start">
+    {#if message.role=="assistant"}
+    <div class="chat chat-start">
+      <div class="chat-bubble bg-primary text-white">{message.answer}</div>
+    </div>
+      {:else}
+      <div class="chat chat-end">
         <div class="chat-bubble bg-primary text-white">{message.answer}</div>
       </div>
+    {/if}
+     
     {/each}
     <!-- Example messages (replace with dynamic content) -->
 
