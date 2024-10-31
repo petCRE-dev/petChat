@@ -2,6 +2,7 @@ export type DifyResponse = {
 	fileinput?:{
 		file?:any|null;
 		filename?:string;
+		thumbnail?:string;
 	};
   role?: string;
   event?: string;
@@ -43,6 +44,7 @@ export type DifyResponse = {
 };
 
 export type DifyFileResponse = {
+	thumbnailUrl?:string;
   id: string;
   name: string;
   size: number;

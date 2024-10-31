@@ -23,7 +23,7 @@
           answer: query,
           role: "user",
           metadata: {},
-          fileinput: fileToUpload ? { file: null, filename: uploadedFileName } : undefined, // Add file to message if uploaded
+          fileinput: fileToUpload ? { file: null, filename: uploadedFileName,thumbnail:fileToUpload.thumbnailUrl } : undefined, // Add file to message if uploaded
         };
         messages = [...messages, userMessage];
         query = "";
@@ -96,7 +96,7 @@
       // Create a data URL for the thumbnail preview
       const reader = new FileReader();
       reader.onload = () => {
-        thumbnailUrl = reader.result as string;
+        fileToUpload.thumbnailUrl = reader.result as string;
       };
       reader.readAsDataURL(file); // Generate the data URL for the image file
     } catch (error) {
@@ -142,8 +142,8 @@
         <div class="chat chat-end">
           <div class="chat-bubble">
             {message.answer}
-            {#if message.fileinput && thumbnailUrl}
-              <img src={thumbnailUrl} alt="Uploaded thumbnail" class="thumbnail" />
+            {#if message.fileinput && message.fileinput.thumbnail}
+              <img src={message.fileinput.thumbnail} alt="Uploaded thumbnail" class="thumbnail" />
               <!-- Display uploaded file name or thumbnail -->
               <div class="uploaded-file-preview mt-2 text-xs text-gray-500">
                 📎 {message.fileinput.filename}
@@ -204,8 +204,8 @@
     gap: 4px;
   }
   .thumbnail {
-    width: 40px;
-    height: 40px;
+    width: 150px;
+    height: 150px;
     object-fit: cover;
     border-radius: 4px;
   }
