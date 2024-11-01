@@ -10,6 +10,7 @@
   let uploadedFileName = ""; // To hold the name of the uploaded file for display
   let thumbnailUrl: string | null = null; // Holds the data URL for the thumbnail
   let loading = false;
+  let conversation_id: string | null|undefined;
 
   async function submitQuery() {
     if (isTesting) {
@@ -19,20 +20,31 @@
     } else {
       try {
         loading = true;
+
+        if (messages.length > 1) {
+          let lastMessage = messages.slice(-1)[0];
+          console.log("last",lastMessage)
+          conversation_id = lastMessage.conversation_id;
+          console.log(conversation_id);
+        }
+
+
+
         let userMessage: DifyResponse = {
           answer: query,
           role: "user",
           metadata: {},
-          fileinput: fileToUpload ? { file: null, filename: uploadedFileName,thumbnail:fileToUpload.thumbnailUrl } : undefined, // Add file to message if uploaded
+          fileinput: fileToUpload ? { file: null, filename: uploadedFileName, thumbnail: fileToUpload.thumbnailUrl } : undefined, // Add file to message if uploaded
         };
         messages = [...messages, userMessage];
         query = "";
 
+        
         // Define the payload to send to the endpoint
         const payload = {
           query: userMessage.answer,
           response_mode: "blocking",
-          conversation_id: "",
+          conversation_id: conversation_id ? conversation_id : "",
           user: "abc-123",
           files: fileToUpload
             ? [
@@ -111,8 +123,8 @@
       uploadFile(file);
     }
   }
-  function handleKeyPress(event:KeyboardEvent){
-    if(event.key==="Enter" &&!loading&& query.length>0){
+  function handleKeyPress(event: KeyboardEvent) {
+    if (event.key === "Enter" && !loading && query.length > 0) {
       submitQuery();
     }
   }
@@ -127,7 +139,7 @@
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black">
             {message.answer}
             <br />
-            <span class="flex  gap-2">
+            <span class="flex gap-2">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
                 {#each message.metadata.retriever_resources ?? [] as retriever}
                   <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} />
@@ -135,8 +147,6 @@
               {/if}
             </span>
           </div>
-          
-          
         </div>
       {:else}
         <div class="chat chat-end">
@@ -155,7 +165,7 @@
     {/each}
     <!-- Loading Bubble (visible while waiting for assistant's response) -->
     {#if loading}
-      <div class="chat chat-start ">
+      <div class="chat chat-start">
         <div class="chat-bubble loading-bubble bg-primary">
           <div class="dot-typing"></div>
         </div>
@@ -183,16 +193,14 @@
         {uploadedFileName}
       </div>
     {/if}
-{#if loading}
-<input class="input input-bordered flex-grow" type="text" disabled  placeholder="Enter your query" />
-  {:else}
-
-  <input class="input input-bordered flex-grow" type="text" bind:value={query} on:keydown={handleKeyPress} placeholder="Enter your query" />
-{/if}
+    {#if loading}
+      <input class="input input-bordered flex-grow" type="text" disabled placeholder="Enter your query" />
+    {:else}
+      <input class="input input-bordered flex-grow" type="text" bind:value={query} on:keydown={handleKeyPress} placeholder="Enter your query" />
+    {/if}
     <button on:click={submitQuery} class="btn btn-accent btn-sm">Submit Query</button>
   </div>
 </div>
-
 
 <style>
   .image-upload > input {
@@ -228,7 +236,7 @@
   }
   .dot-typing::before,
   .dot-typing::after {
-    content: '';
+    content: "";
     width: 8px;
     height: 8px;
     background-color: #333;
