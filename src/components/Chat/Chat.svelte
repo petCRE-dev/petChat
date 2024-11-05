@@ -136,7 +136,7 @@
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
-          <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black">
+          <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap ">
             {message.answer}
             <br />
             <span class="flex gap-2">

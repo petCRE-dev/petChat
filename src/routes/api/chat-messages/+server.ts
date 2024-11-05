@@ -29,6 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const data:DifyResponse = await response.json();
+    console.log(data)
     return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",
