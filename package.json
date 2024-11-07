@@ -29,6 +29,7 @@
   "type": "module",
   "dependencies": {
     "@floating-ui/dom": "1.6.11",
+    "arctic": "^2.2.1",
     "daisyui": "^4.12.14"
   }
 }
