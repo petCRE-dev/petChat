@@ -7,32 +7,38 @@
   import { parse } from "cookie"; // Use to parse cookies
   let menuIsOpen = false;
   let userLoggedIn = false;
-
+  let userInfo = null;
   let msEntraId: MicrosoftEntraId;
   const clientID = import.meta.env.VITE_CLIENT_ID;
   const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
   const tenantId = import.meta.env.VITE_TENANT_ID;
   const redirectUrl = import.meta.env.VITE_REDIRECT_URL;
   msEntraId = new MicrosoftEntraId(tenantId, clientID, clientSecret, redirectUrl);
-  onMount(() => {
+  onMount(async () => {
     const cookies = parse(document.cookie);
-    
+
     const accessToken = cookies.accessToken;
     if (accessToken) {
-    // Move token to sessionStorage and set userLoggedIn to true
-    sessionStorage.setItem("accessToken", accessToken);
-    userLoggedIn = true;
+      // Move token to sessionStorage and set userLoggedIn to true
+      sessionStorage.setItem("accessToken", accessToken);
+      userLoggedIn = true;
 
-    // Optionally, delete the token from cookies after transferring it
-    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-  } else {
-    userLoggedIn = sessionStorage.getItem("accessToken") ? true : false;
-  }
+      userInfo = await fetchUserInfo(accessToken);
+      
+      sessionStorage.setItem("userInfo",JSON.stringify(userInfo));
+      console.log(userInfo);
+      // Optionally, delete the token from cookies after transferring it
+      document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+    } else {
+      userLoggedIn = sessionStorage.getItem("accessToken") ? true : false;
+      const storedUserInfo = sessionStorage.getItem("userInfo");
+      userInfo=storedUserInfo ? JSON.parse(storedUserInfo) : null; 
+      console.log(userInfo)
+    }
 
-  console.log("User logged in:", userLoggedIn);
+    console.log("User logged in:", userLoggedIn);
   });
   function login() {
-    
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
 
@@ -42,12 +48,33 @@
     const scopes = ["user.read"];
     const authorizationURL = msEntraId.createAuthorizationURL(state, codeVerifier, scopes);
     window.location.href = authorizationURL.href;
-
   }
 
   function handleToggle(event: any) {
     menuIsOpen = event.detail.isChecked; // Correct the typo here to access `isChecked`
     console.log(menuIsOpen);
+  }
+  async function fetchUserInfo(token: any) {
+    try {
+      const response = await fetch("https://graph.microsoft.com/v1.0/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching user info: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("User Info:", data);
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch user info:", error);
+      return null;
+    }
   }
 </script>
 
@@ -61,10 +88,12 @@
     <!-- Navbar start (logo or title) -->
     <div class="navbar-start">
       <a class="text-xl font-bold" href="/">petCHAT</a>
+      
     </div>
 
     <!-- Navbar end (actions) -->
     <div class="navbar-end space-x-4">
+      <h2>Hallo, {userInfo.givenName}!</h2>
       <DarkModeSwitch />
       <!-- Use `menuIsOpen` correctly and add the event listener -->
 

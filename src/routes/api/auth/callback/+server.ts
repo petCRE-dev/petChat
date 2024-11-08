@@ -1,5 +1,5 @@
 import { MicrosoftEntraId } from 'arctic';
-import { redirect } from '@sveltejs/kit';
+import { json, redirect } from '@sveltejs/kit';
 
 export async function GET({ url, cookies }) {
   const clientID = import.meta.env.VITE_CLIENT_ID;
@@ -24,6 +24,8 @@ export async function GET({ url, cookies }) {
       cookies.set("accessToken", tokens.accessToken(), { path: '/',httpOnly: false,  // Ensure it's accessible in JavaScript
         sameSite: 'lax' });
 
+       
+      //return json({ success: true,tokens:tokens,entra:msEntraId });
       // Redirect to the homepage
       return new Response(null, {
         status: 302,

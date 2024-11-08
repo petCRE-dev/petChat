@@ -1,4 +1,4 @@
-export type DifyResponse = {
+/* export type DifyResponse = {
 	fileinput?:{
 		file?:any|null;
 		filename?:string;
@@ -53,3 +53,27 @@ export type DifyFileResponse = {
   created_by: string;
   created_at: number;
 };
+ */
+export interface DifyResponse {
+  answer: string;
+  conversation_id?: string;
+  role: "user" | "assistant";
+  metadata: {
+    retriever_resources?: any[];
+  };
+  fileinput?: {
+    file: File | null;
+    filename: string;
+    thumbnail?: string;
+  };
+}
+export interface DifyFileResponse {
+  id: string;
+  name: string;
+  size: number;
+  extension: string;
+  mime_type: string;
+  created_by: string;
+  created_at: number;
+  thumbnailUrl?: string;
+}
