@@ -77,3 +77,13 @@ export interface DifyFileResponse {
   created_at: number;
   thumbnailUrl?: string;
 }
+
+
+export interface UserInfo{
+  displayName:string;
+  givenName:string;
+  id:string;
+  preferredLanguage:string;
+
+
+}

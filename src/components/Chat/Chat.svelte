@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import type { DifyResponse, DifyFileResponse } from "../../types/types";
+  import { onMount,afterUpdate } from "svelte";
+  import type { DifyResponse, DifyFileResponse, UserInfo } from "../../types/types";
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
 
@@ -8,10 +8,25 @@
   let messages: DifyResponse[] = []; // Initialize messages array
   let isTesting = false;
   let fileToUpload: DifyFileResponse | null = null;
-
+  let userInfo: UserInfo | null;
   let loading = false;
   let conversation_id: string | null | undefined;
-
+  let chatMessages:HTMLElement |null;
+  onMount(() => {
+    const userInfoInStorage = sessionStorage.getItem("userInfo");
+    userInfo = userInfoInStorage ? JSON.parse(userInfoInStorage) : null;
+    chatMessages= document.getElementById("chat-messages");
+  });
+ 
+  function scrollToBottom() {
+    chatMessages= document.getElementById("chat-messages");
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    }
+    afterUpdate(() => {
+    scrollToBottom();
+  });
   // Chat.svelte
   async function submitQuery() {
     if (!query.trim() && !fileToUpload) return;
@@ -59,7 +74,7 @@
 
       const payload = {
         query: userMessage.answer || "Analyze the uploaded document",
-        user: "abc-123",
+        user: userInfo!.id,
         response_mode: "blocking",
         conversation_id: lastMessage?.conversation_id || null,
         files: fileToUpload
@@ -74,7 +89,7 @@
         inputs: {},
       };
 
-      console.log("Sending payload:", payload); // Debug log
+      //console.log("Sending payload:", payload); // Debug log
 
       const response = await fetch("/api/chat-messages", {
         method: "POST",
@@ -93,6 +108,7 @@
       const result: DifyResponse = await response.json();
       result.role = "assistant";
       messages = [...messages, result];
+      scrollToBottom()
     } catch (error) {
       console.error(error);
     } finally {
@@ -112,22 +128,22 @@
   }
 </script>
 
-<div id="main-grid" class="flex flex-col h-screen w-full">
+<div id="main-grid" class="flex flex-col h-screen w-full justify-between ">
   <!-- Messages Area -->
-  <div id="chat-messages" class="flex-grow h-full overflow-y-auto mb-[3.5%] p-[1%] bg-accent-100 space-y-4">
+  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4">
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap">
             {message.answer}
             <br />
-            <span class="flex gap-2">
+            <div class="flex flex-row justify-start gap-4">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
                 {#each message.metadata.retriever_resources ?? [] as retriever}
-                  <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} />
+                  <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={(message.metadata.retriever_resources?.indexOf(retriever) +1)} />
                 {/each}
               {/if}
-            </span>
+            </div>
           </div>
         </div>
       {:else}
@@ -152,10 +168,10 @@
   </div>
 
   <!-- Input Area - Fixed at the bottom -->
-  <div id="chat-input" class="flex items-center gap-2 p-4 bg-base-100 border-t border-gray-200 sticky bottom-0">
+  <div id="chat-input" class="flex items-center gap-2 p-4 bg-base-100 border-t border-gray-200 sticky bottom-0 ">
     <!-- Hidden file input for image upload -->
 
-    <FileUploader onFileUploaded={handleFileUploaded} disabled={loading} />
+    <!-- <FileUploader onFileUploaded={handleFileUploaded} disabled={loading} /> -->
 
     <!-- Display file name if uploaded -->
 
@@ -164,7 +180,7 @@
     {:else}
       <input class="input input-bordered flex-grow" type="text" bind:value={query} on:keydown={handleKeyPress} placeholder="Eine Frage stellen..." />
     {/if}
-    <button on:click={submitQuery} class="btn btn-accent btn-sm">Senden</button>
+    <button on:click={submitQuery} class="btn btn-accent btn-sm" disabled = {loading}>Senden</button>
   </div>
 </div>
 

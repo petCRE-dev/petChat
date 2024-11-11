@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // Validate file type if files are present
     
 
-    console.log('Sending to Dify:', requestData);
+    //console.log('Sending to Dify:', requestData);
 
     const response = await fetch("https://api.dify.ai/v1/chat-messages", {
       method: "POST",

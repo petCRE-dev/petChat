@@ -1,8 +1,13 @@
 
 <script lang="ts">
+  import { onMount } from "svelte";
+
     export let id: string;
     export let content: string;
-    
+    export let counter:number=0;
+    onMount(()=>{
+     
+    })
     // Function to open the modal by ID
     function openModal() {
       const modal = document.getElementById(`my_modal_${id}`) as HTMLDialogElement;
@@ -11,7 +16,7 @@
   </script>
   
   <!-- Button to open the modal -->
-  <button class="btn btn-xs" on:click={openModal}>{JSON.parse(content).document_name}</button>
+  <button class="btn btn-xs     text-center shadow-md" on:click={openModal}>Quelle-{counter}</button>
   
   <!-- Modal Dialog with dynamic ID -->
   <dialog id={`my_modal_${id}`} class="modal modal-bottom sm:modal-middle">
