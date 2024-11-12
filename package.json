@@ -32,6 +32,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
     "arctic": "^2.2.1",
     "daisyui": "^4.12.14",
-    "svelte-fa": "^4.0.3"
+    "svelte-fa": "^4.0.3",
+    "svelte-markdown": "^0.4.1"
   }
 }

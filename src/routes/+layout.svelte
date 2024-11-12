@@ -6,8 +6,14 @@
   import { MicrosoftEntraId, generateState, generateCodeVerifier } from "arctic";
   import { parse } from "cookie"; // Use to parse cookies
   import type { UserInfo } from "../types/types";
-import Fa from "svelte-fa";
-import {faMicrosoft} from '@fortawesome/free-brands-svg-icons'
+  import Fa from "svelte-fa";
+  import { faMicrosoft } from "@fortawesome/free-brands-svg-icons";
+ 
+
+
+
+  const appVersion = import.meta.env.VITE_APP_VERSION;
+
   let menuIsOpen = false;
   let userLoggedIn = false;
   let userInfo: UserInfo | null = null;
@@ -54,12 +60,11 @@ import {faMicrosoft} from '@fortawesome/free-brands-svg-icons'
     const authorizationURL = msEntraId.createAuthorizationURL(state, codeVerifier, scopes);
     window.location.href = authorizationURL.href;
   }
-async function handleLogout() {
-  alert("Noch nicht implementiert!")
-}
+  async function handleLogout() {
+    alert("Noch nicht implementiert!");
+  }
   function handleToggle(event: any) {
     menuIsOpen = event.detail.isChecked; // Correct the typo here to access `isChecked`
- 
   }
   async function fetchUserInfo(token: any) {
     try {
@@ -83,7 +88,6 @@ async function handleLogout() {
         preferredLanguage: data.preferredLanguage,
       };
 
-      
       return myUser;
     } catch (error) {
       console.error("Failed to fetch user info:", error);
@@ -94,14 +98,12 @@ async function handleLogout() {
 
 {#if !userLoggedIn}
   <!--here comes the authentication part -->
-  <div class="flex flex-col min-h-screen flex-grow justify-center items-center" >
-
+  <div class="flex flex-col min-h-screen flex-grow justify-center items-center">
     <button class="btn shadow-lg" on:click={login}>
-     <Fa icon={faMicrosoft}/>
-    Login mit Microsoft
-  </button>
+      <Fa icon={faMicrosoft} />
+      Login mit Microsoft
+    </button>
   </div>
-
 {:else}
   <!-- Navbar -->
   <div class="navbar bg-base-100 shadow-md">
@@ -134,21 +136,17 @@ async function handleLogout() {
     <!-- Drawer side content (sidebar) -->
     <div class="drawer-side">
       <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-      <div class="menu bg-base-100  text-base-content min-h-full w-80 p-4">
-        <div class="flex flex-grow flex-col justify-between ">
-          <div class="flex flex-grow  ">
+      <div class="menu bg-base-100 text-base-content min-h-full w-80 p-4">
+        <div class="flex flex-grow flex-col justify-between">
+          <div class="flex flex-grow">
             <h2 class="">Meine Unterhaltungen</h2>
-
           </div>
-          <div class="flex flex-row p-1 justify-end">
+          <div class="flex flex-row  justify-between items-end ">
+            <p>v. {appVersion}</p>
             <button class="btn btn-sm shadow-md btn-secondary btn-outline" on:click={handleLogout}>Logout</button>
           </div>
         </div>
-
       </div>
-      
-      
-    
     </div>
   </div>
 {/if}

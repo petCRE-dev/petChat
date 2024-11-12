@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onMount,afterUpdate } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import type { DifyResponse, DifyFileResponse, UserInfo } from "../../types/types";
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
+  import SvelteMarkdown from "svelte-markdown";
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -11,20 +12,25 @@
   let userInfo: UserInfo | null;
   let loading = false;
   let conversation_id: string | null | undefined;
-  let chatMessages:HTMLElement |null;
+  let chatMessages: HTMLElement | null;
+  
   onMount(() => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
     userInfo = userInfoInStorage ? JSON.parse(userInfoInStorage) : null;
-    chatMessages= document.getElementById("chat-messages");
+
+    chatMessages = document.getElementById("chat-messages");
   });
- 
+  const getUserInfos = async () => {
+    const userInfoInStorage = sessionStorage.getItem("userInfo");
+    userInfo = userInfoInStorage ? JSON.parse(userInfoInStorage) : null;
+  };
   function scrollToBottom() {
-    chatMessages= document.getElementById("chat-messages");
+    chatMessages = document.getElementById("chat-messages");
     if (chatMessages) {
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    }
-    afterUpdate(() => {
+  }
+  afterUpdate(() => {
     scrollToBottom();
   });
   // Chat.svelte
@@ -71,7 +77,7 @@
       };
 
       const lastMessage = messages.length > 1 ? messages[messages.length - 2] : null;
-
+      await getUserInfos();
       const payload = {
         query: userMessage.answer || "Analyze the uploaded document",
         user: userInfo!.id,
@@ -108,7 +114,7 @@
       const result: DifyResponse = await response.json();
       result.role = "assistant";
       messages = [...messages, result];
-      scrollToBottom()
+      scrollToBottom();
     } catch (error) {
       console.error(error);
     } finally {
@@ -128,19 +134,20 @@
   }
 </script>
 
-<div id="main-grid" class="flex flex-col h-screen w-full justify-between ">
+<div id="main-grid" class="flex flex-col h-screen w-full justify-between">
   <!-- Messages Area -->
   <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4">
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap">
-            {message.answer}
+            <SvelteMarkdown source={message.answer} />
+            <!--  {message.answer} -->
             <br />
             <div class="flex flex-row justify-start gap-4">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
                 {#each message.metadata.retriever_resources ?? [] as retriever}
-                  <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={(message.metadata.retriever_resources?.indexOf(retriever) +1)} />
+                  <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={message.metadata.retriever_resources?.indexOf(retriever) + 1} />
                 {/each}
               {/if}
             </div>
@@ -168,7 +175,7 @@
   </div>
 
   <!-- Input Area - Fixed at the bottom -->
-  <div id="chat-input" class="flex items-center gap-2 p-4 bg-base-100 border-t border-gray-200 sticky bottom-0 ">
+  <div id="chat-input" class="flex items-center gap-2 p-4 bg-base-100 border-t border-gray-200 sticky bottom-0">
     <!-- Hidden file input for image upload -->
 
     <!-- <FileUploader onFileUploaded={handleFileUploaded} disabled={loading} /> -->
@@ -180,7 +187,7 @@
     {:else}
       <input class="input input-bordered flex-grow" type="text" bind:value={query} on:keydown={handleKeyPress} placeholder="Eine Frage stellen..." />
     {/if}
-    <button on:click={submitQuery} class="btn btn-accent btn-sm" disabled = {loading}>Senden</button>
+    <button on:click={submitQuery} class="btn btn-accent btn-sm" disabled={loading}>Senden</button>
   </div>
 </div>
 
