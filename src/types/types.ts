@@ -66,6 +66,7 @@ export interface DifyResponse {
     filename: string;
     thumbnail?: string;
   };
+  message_id?:string;
 }
 export interface DifyFileResponse {
   id: string;

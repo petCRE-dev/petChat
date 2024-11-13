@@ -4,8 +4,7 @@
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
   import SvelteMarkdown from "svelte-markdown";
-import CustomLink from "../CustomLink.svelte";
-
+  import CustomLink from "../CustomLink.svelte";
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -116,6 +115,8 @@ import CustomLink from "../CustomLink.svelte";
       const result: DifyResponse = await response.json();
       result.role = "assistant";
       messages = [...messages, result];
+      console.log("result",result)
+      //getSuggestedMessages(result.message_id,result.conversation_id,userInfo!.id)
       scrollToBottom();
     } catch (error) {
       console.error(error);
@@ -123,6 +124,20 @@ import CustomLink from "../CustomLink.svelte";
       loading = false;
       fileToUpload = null;
     }
+  }
+  async function  getSuggestedMessages(messageId:string|undefined,conversationId:string|undefined,userId:string){
+    console.log(conversationId)
+    const response = await fetch(`/api/messages/${messageId}/suggested?user=${userId}&conversation_id=${conversationId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        //body: JSON.stringify(payload),
+      });
+      if(!response.ok){
+        console.log("error",response)
+      }
+      
   }
   // Function triggered when file input changes (file is selected)
   function handleFileUploaded(file: DifyFileResponse) {
@@ -138,7 +153,7 @@ import CustomLink from "../CustomLink.svelte";
 
 <div id="main-grid" class="flex flex-col h-screen w-full justify-between">
   <!-- Messages Area -->
-  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4 text-sm">
+  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4 text-md">
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
@@ -173,6 +188,8 @@ import CustomLink from "../CustomLink.svelte";
           <div class="dot-typing"></div>
         </div>
       </div>
+    {:else if messages.length === 0}
+      <!-- <div class="bg-red-400 flex flex-row flex-grow h-20">test</div> -->
     {/if}
   </div>
 
@@ -194,11 +211,9 @@ import CustomLink from "../CustomLink.svelte";
 </div>
 
 <style>
-a{
-
-  color: blue; /* A warm orange tone */
-
-}
+  a {
+    color: blue; /* A warm orange tone */
+  }
   .image-upload > input {
     display: none;
   }
