@@ -4,6 +4,8 @@
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
   import SvelteMarkdown from "svelte-markdown";
+import CustomLink from "../CustomLink.svelte";
+
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -13,7 +15,7 @@
   let loading = false;
   let conversation_id: string | null | undefined;
   let chatMessages: HTMLElement | null;
-  
+
   onMount(() => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
     userInfo = userInfoInStorage ? JSON.parse(userInfoInStorage) : null;
@@ -136,12 +138,12 @@
 
 <div id="main-grid" class="flex flex-col h-screen w-full justify-between">
   <!-- Messages Area -->
-  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4">
+  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4 text-sm">
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap">
-            <SvelteMarkdown source={message.answer} />
+            <SvelteMarkdown source={message.answer} renderers={{ link: CustomLink }} />
             <!--  {message.answer} -->
             <br />
             <div class="flex flex-row justify-start gap-4">
@@ -192,6 +194,11 @@
 </div>
 
 <style>
+a{
+
+  color: blue; /* A warm orange tone */
+
+}
   .image-upload > input {
     display: none;
   }
