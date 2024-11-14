@@ -16,8 +16,10 @@
   let conversation_id: string | null | undefined;
   let chatMessages: HTMLElement | null;
   let suggestedMessages: Array<string> = [];
-  let likeClicked = false;
-let dislikeClicked = false;
+
+ // State tracking objects, keyed by messageId
+ let likeClicked:any = {};
+  let dislikeClicked:any = {};
 
   onMount(() => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
@@ -39,17 +41,21 @@ let dislikeClicked = false;
   afterUpdate(() => {
     scrollToBottom();
   });
-  function handleFeedback(type: number, rating: string | null) {
+  function handleFeedback(type: number, rating: string | null, messageId: string) {
+    // Initialize state for the message if not present
+    if (!likeClicked[messageId]) likeClicked[messageId] = false;
+    if (!dislikeClicked[messageId]) dislikeClicked[messageId] = false;
+
     if (rating === null) {
       // Reset both when the rating is null
-      likeClicked = false;
-      dislikeClicked = false;
+      likeClicked[messageId] = false;
+      dislikeClicked[messageId] = false;
     } else if (type === 0) { // "Like" button clicked
-      likeClicked = true;
-      dislikeClicked = false;
+      likeClicked[messageId] = true;
+      dislikeClicked[messageId] = false;
     } else if (type === 1) { // "Dislike" button clicked
-      dislikeClicked = true;
-      likeClicked = false;
+      dislikeClicked[messageId] = true;
+      likeClicked[messageId] = false;
     }
   }
 
@@ -177,15 +183,15 @@ let dislikeClicked = false;
               userId={userInfo?.id}
               messageId={message?.message_id}
               buttonType={0}
-              on:feedback={(event) => handleFeedback(0, event.detail.rating)}
-              disabled={dislikeClicked}
+              on:feedback={(event) => handleFeedback(0, event.detail.rating, message.message_id)}
+              disabled={dislikeClicked[message.message_id] || false}
             />
             <FeedbackButton
               userId={userInfo?.id}
               messageId={message?.message_id}
               buttonType={1}
-              on:feedback={(event) => handleFeedback(1, event.detail.rating)}
-              disabled={likeClicked}
+              on:feedback={(event) => handleFeedback(1, event.detail.rating, message.message_id)}
+              disabled={likeClicked[message.message_id] || false}
             />
             </div>
             <!--  {message.answer} -->
