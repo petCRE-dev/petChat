@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount, afterUpdate } from "svelte";
-  import type { DifyResponse, DifyFileResponse, UserInfo } from "../../types/types";
+  import type { DifyResponse, DifyFileResponse, UserInfo, DifySuggested } from "../../types/types";
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
   import SvelteMarkdown from "svelte-markdown";
   import CustomLink from "../CustomLink.svelte";
+ 
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -14,6 +15,7 @@
   let loading = false;
   let conversation_id: string | null | undefined;
   let chatMessages: HTMLElement | null;
+  let suggestedMessages: Array<string> = [];
 
   onMount(() => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
@@ -57,25 +59,6 @@
       query = "";
 
       // Map file extensions to Dify's supported types
-      const getFileType = (filename: string): string => {
-        const ext = filename.toLowerCase().split(".").pop() || "";
-        switch (ext) {
-          case "pdf":
-            return "PDF";
-          case "doc":
-          case "docx":
-            return "DOC";
-          case "txt":
-            return "TXT";
-          case "csv":
-            return "CSV";
-          case "xls":
-          case "xlsx":
-            return "XLS";
-          default:
-            return "TXT";
-        }
-      };
 
       const lastMessage = messages.length > 1 ? messages[messages.length - 2] : null;
       await getUserInfos();
@@ -115,8 +98,17 @@
       const result: DifyResponse = await response.json();
       result.role = "assistant";
       messages = [...messages, result];
-      console.log("result",result)
-      //getSuggestedMessages(result.message_id,result.conversation_id,userInfo!.id)
+      console.log("result", result);
+
+      const suggestedResponse = await getSuggestedMessages(result.message_id, userInfo!.id);
+      if (suggestedResponse.result === "success") {
+        suggestedMessages = suggestedResponse.data;
+      }else{
+        suggestedMessages=[]
+
+      }
+
+
       scrollToBottom();
     } catch (error) {
       console.error(error);
@@ -125,19 +117,27 @@
       fileToUpload = null;
     }
   }
-  async function  getSuggestedMessages(messageId:string|undefined,conversationId:string|undefined,userId:string){
-    console.log(conversationId)
-    const response = await fetch(`/api/messages/${messageId}/suggested?user=${userId}&conversation_id=${conversationId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        //body: JSON.stringify(payload),
-      });
-      if(!response.ok){
-        console.log("error",response)
-      }
-      
+  async function getSuggestedMessages(messageId: string | undefined, userId: string) {
+    let data: DifySuggested = { result: "failure", data: [] };
+    const response = await fetch(`/api/messages/${messageId}/suggested?user=${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      console.log("error", response);
+    } else {
+      const response_value: DifySuggested = await response.json();
+      return response_value;
+    }
+    return data;
+  }
+  async function sendSuggestedAsMessage(suggestedMessage:string){
+    query=suggestedMessage;
+    await submitQuery();
+
+
   }
   // Function triggered when file input changes (file is selected)
   function handleFileUploaded(file: DifyFileResponse) {
@@ -161,7 +161,7 @@
             <SvelteMarkdown source={message.answer} renderers={{ link: CustomLink }} />
             <!--  {message.answer} -->
             <br />
-            <div class="flex flex-row justify-start gap-4">
+            <div class="flex flex-row flex-wrap flex-grow justify-start gap-4 md:flex-row sm:flex-col">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
                 {#each message.metadata.retriever_resources ?? [] as retriever}
                   <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={message.metadata.retriever_resources?.indexOf(retriever) + 1} />
@@ -188,8 +188,12 @@
           <div class="dot-typing"></div>
         </div>
       </div>
-    {:else if messages.length === 0}
-      <!-- <div class="bg-red-400 flex flex-row flex-grow h-20">test</div> -->
+    {:else if suggestedMessages.length > 0}
+      <div class="flex flex-row flex-wrap flex-grow justify-end gap-4 md:flex-row sm:flex-col">
+        {#each suggestedMessages as suggested}
+        <button class="btn btn-neutral btn-wide" on:click={async () => await sendSuggestedAsMessage(suggested)}>{suggested}</button>
+        {/each}
+      </div> 
     {/if}
   </div>
 

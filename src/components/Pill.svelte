@@ -16,7 +16,7 @@
   </script>
   
   <!-- Button to open the modal -->
-  <button class="btn btn-xs     text-center shadow-md" on:click={openModal}>Quelle-{counter}</button>
+  <button class="btn btn-wide btn-sm  text-center shadow-md" on:click={openModal}>Quelle-{counter}</button>
   
   <!-- Modal Dialog with dynamic ID -->
   <dialog id={`my_modal_${id}`} class="modal modal-bottom sm:modal-middle">

@@ -88,3 +88,7 @@ export interface UserInfo{
 
 
 }
+export interface DifySuggested{
+  result:string;
+  data:Array<string>;
+}
