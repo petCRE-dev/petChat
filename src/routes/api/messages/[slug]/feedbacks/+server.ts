@@ -1,26 +1,17 @@
-// src/routes/api/chat-messages/+server.ts
 import type { RequestHandler } from "@sveltejs/kit";
 import { env } from "$env/dynamic/public";
-import type { DifyResponse } from "../../../types/types";
-
-// api/chat-messages/+server.ts
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
   const secretKey = env.PUBLIC_VITE_DIFY_API_KEY;
 
   try {
-    const requestData = await request.json();
-
-    // Validate file type if files are present
-
-    //console.log('Sending to Dify:', requestData);
-
-    const response = await fetch("https://api.dify.ai/v1/chat-messages", {
+    const requestBody = await request.json();
+    const response = await fetch(`https://api.dify.ai/v1/messages/${params.slug}/feedbacks`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${secretKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(requestData),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -33,16 +24,20 @@ export const POST: RequestHandler = async ({ request }) => {
           details: errorData.message || "Unknown error",
           code: errorData.code,
         }),
-        { status: response.status }
+        { status: response.status, headers: { "Content-Type": "application/json" } }
       );
     }
+    const data = await response.json();
+    console.log(data);
 
-    const data: DifyResponse = await response.json();
+
     return new Response(JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json",
       },
     });
+
+
   } catch (error) {
     console.error("Server error:", error);
     return new Response(
@@ -50,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
         error: "Request failed",
         details: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500 }
+      { status: 500 , headers: { "Content-Type": "application/json" }}
     );
   }
 };

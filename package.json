@@ -30,6 +30,7 @@
   "dependencies": {
     "@floating-ui/dom": "1.6.11",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "arctic": "^2.2.1",
     "daisyui": "^4.12.14",
     "svelte-fa": "^4.0.3",

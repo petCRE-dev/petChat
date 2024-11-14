@@ -5,7 +5,7 @@
   import FileUploader from "./FileUploader.svelte";
   import SvelteMarkdown from "svelte-markdown";
   import CustomLink from "../CustomLink.svelte";
- 
+  import FeedbackButton from "../FeedbackButton.svelte";
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -16,6 +16,8 @@
   let conversation_id: string | null | undefined;
   let chatMessages: HTMLElement | null;
   let suggestedMessages: Array<string> = [];
+  let likeClicked = false;
+let dislikeClicked = false;
 
   onMount(() => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
@@ -33,9 +35,24 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
+
   afterUpdate(() => {
     scrollToBottom();
   });
+  function handleFeedback(type: number, rating: string | null) {
+    if (rating === null) {
+      // Reset both when the rating is null
+      likeClicked = false;
+      dislikeClicked = false;
+    } else if (type === 0) { // "Like" button clicked
+      likeClicked = true;
+      dislikeClicked = false;
+    } else if (type === 1) { // "Dislike" button clicked
+      dislikeClicked = true;
+      likeClicked = false;
+    }
+  }
+
   // Chat.svelte
   async function submitQuery() {
     if (!query.trim() && !fileToUpload) return;
@@ -103,11 +120,9 @@
       const suggestedResponse = await getSuggestedMessages(result.message_id, userInfo!.id);
       if (suggestedResponse.result === "success") {
         suggestedMessages = suggestedResponse.data;
-      }else{
-        suggestedMessages=[]
-
+      } else {
+        suggestedMessages = [];
       }
-
 
       scrollToBottom();
     } catch (error) {
@@ -133,11 +148,9 @@
     }
     return data;
   }
-  async function sendSuggestedAsMessage(suggestedMessage:string){
-    query=suggestedMessage;
+  async function sendSuggestedAsMessage(suggestedMessage: string) {
+    query = suggestedMessage;
     await submitQuery();
-
-
   }
   // Function triggered when file input changes (file is selected)
   function handleFileUploaded(file: DifyFileResponse) {
@@ -159,10 +172,27 @@
         <div class="chat chat-start">
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap">
             <SvelteMarkdown source={message.answer} renderers={{ link: CustomLink }} />
+            <div>
+              <FeedbackButton
+              userId={userInfo?.id}
+              messageId={message?.message_id}
+              buttonType={0}
+              on:feedback={(event) => handleFeedback(0, event.detail.rating)}
+              disabled={dislikeClicked}
+            />
+            <FeedbackButton
+              userId={userInfo?.id}
+              messageId={message?.message_id}
+              buttonType={1}
+              on:feedback={(event) => handleFeedback(1, event.detail.rating)}
+              disabled={likeClicked}
+            />
+            </div>
             <!--  {message.answer} -->
-            <br />
+
             <div class="flex flex-row flex-wrap flex-grow justify-start gap-4 md:flex-row sm:flex-col">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
+                <br />
                 {#each message.metadata.retriever_resources ?? [] as retriever}
                   <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={message.metadata.retriever_resources?.indexOf(retriever) + 1} />
                 {/each}
@@ -191,9 +221,9 @@
     {:else if suggestedMessages.length > 0}
       <div class="flex flex-row flex-wrap flex-grow justify-end gap-4 md:flex-row sm:flex-col">
         {#each suggestedMessages as suggested}
-        <button class="btn btn-neutral btn-wide" on:click={async () => await sendSuggestedAsMessage(suggested)}>{suggested}</button>
+          <button class="btn btn-neutral btn-wide" on:click={async () => await sendSuggestedAsMessage(suggested)}>{suggested}</button>
         {/each}
-      </div> 
+      </div>
     {/if}
   </div>
 
