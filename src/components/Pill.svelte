@@ -33,7 +33,7 @@
 </script>
 
 <!-- Button to open the modal -->
-<button class="btn btn-sm text-center shadow-md max-sm:text-xs max-w-48" on:click={openModal}>
+<button class="btn btn-sm text-center shadow-md max-sm:text-xs max-w-56 p-2" on:click={openModal}>
   {JSON.parse(content).document_name}
 </button>
 <dialog id={`my_modal_${id}`} class="modal max-sm:modal-bottom ">

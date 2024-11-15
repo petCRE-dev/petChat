@@ -10,7 +10,11 @@
 
 
   let query = ""; // To hold the input query
-  let messages: DifyResponse[] = []; // Initialize messages array
+  let messages: DifyResponse[] = [{
+    answer:"Hallo,\nIch bin eine junge KI und gebe mein Bestes, dir zu helfen. Trotzdem können mir Fehler unterlaufen – mit der Zeit werde ich mich aber verbessern. Bitte verlasse dich nicht vollständig auf meine Antworten, besonders bei wichtigen Themen.\n**Prüfe im Zweifel die Informationen oder kontaktiere einen Mitarbeiter.**",
+    role:"assistant",
+    metadata:{}
+  }]; // Initialize messages array
   let isTesting = false;
   let fileToUpload: DifyFileResponse | null = null;
   let userInfo: UserInfo | null;
@@ -182,10 +186,11 @@
   <!-- Messages Area -->
   <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[20.5%] p-[1%] bg-accent-100 space-y-4 text-md">
     {#each messages as message}
-      {#if message.role == "assistant"}
+      {#if message.role == "assistant" }
         <div class="chat chat-start">
           <div class="chat-bubble bg-primary shadow-lg shadow-accent/50 text-black whitespace-pre-wrap">
             <SvelteMarkdown source={message.answer} renderers={{ link: CustomLink }} />
+           {#if  message.message_id!=null}
             <div>
               <FeedbackButton
               userId={userInfo?.id}
@@ -202,6 +207,7 @@
               disabled={likeClicked[message.message_id] || false}
             />
             </div>
+            {/if}
             <!--  {message.answer} -->
             <br />
             <div class="flex flex-row flex-wrap flex-grow justify-start gap-4 md:flex-row sm:flex-col">

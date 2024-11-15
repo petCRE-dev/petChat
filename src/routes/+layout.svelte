@@ -74,7 +74,10 @@
     const authorizationURL = msEntraId.createAuthorizationURL(state, codeVerifier, scopes);
     window.location.href = authorizationURL.href;
   }
-  async function handleLogout() {
+   function handleLogout() {
+    alert("Noch nicht implementiert!");
+  }
+   function handleHelp() {
     alert("Noch nicht implementiert!");
   }
   function handleToggle(event: any) {
@@ -178,6 +181,7 @@
           </div>
           <div class="flex flex-row justify-between items-end bottom-0 sticky bg-base-100 p-4">
             <p>v. {appVersion}</p>
+            <button class="btn btn-sm shadow-md btn-neutral btn-outline" on:click={handleHelp}>Hilfe</button>
             <button class="btn btn-sm shadow-md btn-secondary btn-outline" on:click={handleLogout}>Logout</button>
           </div>
         </div>
