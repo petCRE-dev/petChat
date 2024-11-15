@@ -137,7 +137,7 @@
 
     <!-- Navbar end (actions) -->
     <div class="navbar-end space-x-4">
-      <div class="mx-4"><button class="btn btn-wide btn-sm shadow-md btn-warning" on:click={startNewChat}>Neue Chat starten</button></div>
+      <div class="mx-4"><button class="btn  btn-sm shadow-md btn-warning" on:click={startNewChat}>Neu</button></div>
       <h2>Hallo, {userInfo?.givenName}!</h2>
       <DarkModeSwitch />
       <!-- Use `menuIsOpen` correctly and add the event listener -->
