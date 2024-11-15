@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
       },
     });
     const data: DifySuggested = await response.json();
-    console.log("SUGGESTED  ", data);
+  
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Dify API Error:", errorData);

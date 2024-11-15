@@ -92,3 +92,18 @@ export interface DifySuggested{
   result:string;
   data:Array<string>;
 }
+interface DifyConversationData{
+  id: string;
+  name:string;
+  inputs: {},
+  status: string;
+  introduction: string;
+  created_at: number;
+  updated_at: number;
+}
+export interface DifyConversations{
+  limit:number;
+    has_more: boolean;
+    data:Array<DifyConversationData>;
+  
+}

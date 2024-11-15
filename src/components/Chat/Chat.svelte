@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount, afterUpdate,onDestroy } from "svelte";
   import type { DifyResponse, DifyFileResponse, UserInfo, DifySuggested } from "../../types/types";
   import Pill from "../Pill.svelte";
   import FileUploader from "./FileUploader.svelte";
   import SvelteMarkdown from "svelte-markdown";
   import CustomLink from "../CustomLink.svelte";
   import FeedbackButton from "../FeedbackButton.svelte";
+  
+
 
   let query = ""; // To hold the input query
   let messages: DifyResponse[] = []; // Initialize messages array
@@ -27,6 +29,12 @@
 
     chatMessages = document.getElementById("chat-messages");
   });
+  onDestroy(() => {
+    console.log('Chat component is destroyed');
+    // Perform cleanup actions here if necessary
+  });
+
+
   const getUserInfos = async () => {
     const userInfoInStorage = sessionStorage.getItem("userInfo");
     userInfo = userInfoInStorage ? JSON.parse(userInfoInStorage) : null;

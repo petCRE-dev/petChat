@@ -5,12 +5,9 @@
   import { onMount } from "svelte";
   import { MicrosoftEntraId, generateState, generateCodeVerifier } from "arctic";
   import { parse } from "cookie"; // Use to parse cookies
-  import type { UserInfo } from "../types/types";
+  import { type DifyConversations, type UserInfo } from "../types/types";
   import Fa from "svelte-fa";
   import { faMicrosoft } from "@fortawesome/free-brands-svg-icons";
- 
-
-
 
   const appVersion = import.meta.env.VITE_APP_VERSION;
 
@@ -24,7 +21,7 @@
   const tenantId = import.meta.env.VITE_TENANT_ID;
   const redirectUrl = import.meta.env.VITE_REDIRECT_URL;
   msEntraId = new MicrosoftEntraId(tenantId, clientID, clientSecret, redirectUrl);
-
+  let conversations: DifyConversations | null = null;
   onMount(async () => {
     const cookies = parse(document.cookie);
 
@@ -48,7 +45,24 @@
     }
 
     //console.log("User logged in:", userLoggedIn);
+
+    conversations = await fetchConversations(userInfo?.id);
   });
+  async function fetchConversations(userId: string | undefined) {
+    let conversationsFromResponse: DifyConversations | null = null;
+    if (userId) {
+      const response = await fetch(`/api/conversations?user=${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      conversationsFromResponse = await response.json();
+      console.log(conversationsFromResponse);
+    }
+    return conversationsFromResponse;
+  }
+
   function login() {
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
@@ -94,6 +108,12 @@
       return null;
     }
   }
+
+  function startNewChat() {
+    // Dispatch a global event to reset the chat
+    const event = new Event("newChat");
+    window.dispatchEvent(event);
+  }
 </script>
 
 {#if !userLoggedIn}
@@ -114,6 +134,7 @@
 
     <!-- Navbar end (actions) -->
     <div class="navbar-end space-x-4">
+      <div class="mx-4"><button class="btn btn-wide btn-sm shadow-md btn-warning" on:click={startNewChat}>Neue Chat starten</button></div>
       <h2>Hallo, {userInfo?.givenName}!</h2>
       <DarkModeSwitch />
       <!-- Use `menuIsOpen` correctly and add the event listener -->
@@ -136,12 +157,26 @@
     <!-- Drawer side content (sidebar) -->
     <div class="drawer-side">
       <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-      <div class="menu bg-base-100 text-base-content min-h-full w-80 p-4">
+      <div class="menu bg-base-100 text-base-content min-h-full w-80">
         <div class="flex flex-grow flex-col justify-between">
-          <div class="flex flex-grow">
-            <h2 class="">Meine Unterhaltungen</h2>
+          <div class="my-4 text-center text-xl top-0  bg-base-100 bg-opacity-100 p-4">
+            Meine Unterhaltungen
           </div>
-          <div class="flex flex-row  justify-between items-end ">
+          <div class="flex flex-col flex-grow gap-4">
+            
+            {#if conversations && conversations.data.length > 0}
+              
+                {#each conversations.data as conversation}
+                <button class="btn">
+                  <p> {conversation.name}</p>
+
+                
+                </button>
+                {/each}
+             
+            {/if}
+          </div>
+          <div class="flex flex-row justify-between items-end bottom-0 sticky bg-base-100 p-4">
             <p>v. {appVersion}</p>
             <button class="btn btn-sm shadow-md btn-secondary btn-outline" on:click={handleLogout}>Logout</button>
           </div>
