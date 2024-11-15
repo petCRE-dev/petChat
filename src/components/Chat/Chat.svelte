@@ -180,7 +180,7 @@
 
 <div id="main-grid" class="flex flex-col h-screen w-full justify-between">
   <!-- Messages Area -->
-  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[15.5%] p-[1%] bg-accent-100 space-y-4 text-md">
+  <div id="chat-messages" class="flex-grow h-full overflow-y-auto pb-[5%] max-sm:mb-[20.5%] p-[1%] bg-accent-100 space-y-4 text-md">
     {#each messages as message}
       {#if message.role == "assistant"}
         <div class="chat chat-start">
@@ -203,10 +203,10 @@
             />
             </div>
             <!--  {message.answer} -->
-
+            <br />
             <div class="flex flex-row flex-wrap flex-grow justify-start gap-4 md:flex-row sm:flex-col">
               {#if (message.metadata.retriever_resources ?? []).length > 0}
-                <br />
+                
                 {#each message.metadata.retriever_resources ?? [] as retriever}
                   <Pill id={retriever.segment_id} content={JSON.stringify(retriever)} counter={message.metadata.retriever_resources?.indexOf(retriever) + 1} />
                 {/each}

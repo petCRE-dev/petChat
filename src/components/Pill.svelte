@@ -33,16 +33,33 @@
 </script>
 
 <!-- Button to open the modal -->
-<button class="btn btn-wide btn-sm text-center shadow-md" on:click={openModal}>
-  Quelle-{counter}
+<button class="btn btn-sm text-center shadow-md max-sm:text-xs max-w-48" on:click={openModal}>
+  {JSON.parse(content).document_name}
 </button>
+<dialog id={`my_modal_${id}`} class="modal max-sm:modal-bottom ">
+  <div class="modal-box max-w-5xl">
+    <form method="dialog" class=" ">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 ">✕</button>
+    </form>
+    <div class="prose text-2xl">{JSON.parse(content).document_name}</div>
+    <pre class="py-4 text-black bg-gray-100 p-4 rounded" style="overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">
+      <SvelteMarkdown source={formattedContent}></SvelteMarkdown>
+    </pre>
+    <p class="prose max-w-none lg:prose-xl dark:prose-invert" style="overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">
+      {JSON.parse(content).content.split(';').join('\n')}
+    </p>
+   
+    
+   
+  </div>
+</dialog>
+<!-- 
 
-<!-- Modal Dialog with dynamic ID -->
-<dialog id={`my_modal_${id}`} class="modal modal-bottom sm:modal-middle">
-  <div class="modal-box">
+<dialog id={`my_modal_${id}`} class="modal modal-bottom sm:modal-middle ">
+  <div class="modal-box  ">
     <h3 class="font-bold text-lg text-black">{JSON.parse(content).document_name}</h3>
     
-    <!-- Preformatted JSON content with limited height and scrollable overflow -->
+    
     <pre class="py-4 text-black bg-gray-100 p-4 rounded" style="overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">
       <SvelteMarkdown source={formattedContent}></SvelteMarkdown>
     </pre>
@@ -52,10 +69,11 @@
     <p class="text-black">score: {JSON.parse(content).score}</p>
     <p class="text-black">dataset: {JSON.parse(content).dataset_name}</p>
     <div class="modal-action">
-      <form method="dialog">
-        <!-- Button to close the modal -->
+      <form method="dialog" >
+       
         <button class="btn">Close</button>
       </form>
     </div>
   </div>
 </dialog>
+ -->
